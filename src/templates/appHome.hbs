@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotori API</title>
+  <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/135934045" type="image/x-icon">
+</head>
+<body>
+  <div class="main-div">
+    <h1 class="main-header">Kotori API</h1>
+    <p class="main-text">Visit the <a class="main-link" href="{{ docsUri }}">docs</a></p>
+    <img class="main-image" src="https://i.imgur.com/OfUpKqr.gif" alt="image" draggable="false"/>
+    <small class="small-text text-with-text-icon">
+      <span>Made</span>
+      <span>with</span>
+      <img class="text-icon" src="https://i.imgur.com/U8JdY7l.png" alt="💚"/>
+      by
+      <a class="main-link" href="https://github.com/HidekiHrk">
+        HidekiHrk
+      </a>
+    </small>
+  </div>
+</body>
+<style>
+  :root {
+    --text-color: #ddd;
+    --text-primary: #99FFBB;
+    --bg-color: #333345;
+  }
+
+  html, body {
+    padding: 0;
+    margin: 0;
+    background-color: var(--bg-color);
+    font-family: 'Courier New', Courier, monospace;
+  }
+  
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  div.main-div {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  h1.main-header {
+    color: var(--text-color);
+    font-size: 1.3rem;
+  }
+
+  p.main-text {
+    color: var(--text-color);
+    font-size: 1.1rem;
+  }
+
+  a.main-link {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  small.small-text {
+    color: var(--text-color);
+  }
+
+  img.text-icon {
+    height: 1rem;
+    user-select: none;
+    -webkit-user-drag: none;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  img.main-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    object-fit: cover;
+    object-position: center;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .text-with-text-icon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.4em;
+    user-select: none;
+  }
+  
+  .text-with-text-icon * {
+    user-select: none;
+  }
+</style>
+</html>
