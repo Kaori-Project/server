@@ -7,4 +7,5 @@ export const CONFIG = Object.freeze({
   DOCS_URI: process.env?.DOCS_API ?? 'apidocs',
   TOKEN: process.env?.TOKEN ?? '',
   GUILD_ID: process.env?.GUILD_ID ?? '',
+  PORT: parseInt(process.env?.PORT ?? '3000'),
 });

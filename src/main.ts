@@ -23,6 +23,6 @@ async function bootstrap() {
 
   SwaggerModule.setup(CONFIG.DOCS_URI, app, document);
 
-  await app.listen(3000);
+  await app.listen(CONFIG.PORT);
 }
 bootstrap();
