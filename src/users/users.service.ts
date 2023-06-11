@@ -4,7 +4,9 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { CONFIG } from 'src/utils/config';
 import { KaoriError, KaoriErrorCodes } from 'src/utils/errors';
 import { cacheFactory } from 'src/utils/requests';
+import type { ISerializedUser } from './users.types';
 import { DiscordUsersErrorCodes } from './users.types';
+
 const intents = [
   GatewayIntentBits.GuildPresences,
   GatewayIntentBits.Guilds,
@@ -21,7 +23,7 @@ export class UsersService {
   }
 
   async getUserInfo(userId: string): Promise<{
-    user: User;
+    user: ISerializedUser;
     presence: GuildMember['presence'];
   }> {
     const cacheKey = `getUserInfo-${userId}`;
@@ -29,7 +31,7 @@ export class UsersService {
     if (cachedData) return cachedData;
     const member = await this.getGuildMember(userId);
     const returnObj = {
-      user: member.user,
+      user: this.serializeUser(member.user),
       presence: member.presence,
     };
     this.requestCache.insert(cacheKey, returnObj);
@@ -43,8 +45,7 @@ export class UsersService {
     for (const [, guild] of this.client.guilds.cache) {
       try {
         const member = await guild.members.fetch(userId);
-        if (fetchUser)
-          member.user = (await member?.user?.fetch?.()) ?? member.user;
+        if (fetchUser) member.user = await this.getMemberUser(member);
         return member;
       } catch (err) {
         if (![DiscordUsersErrorCodes.UnknownUser].includes(err?.rawError?.code))
@@ -52,6 +53,18 @@ export class UsersService {
       }
       throw new KaoriError(KaoriErrorCodes.UserNotTracked);
     }
+  }
+
+  private async getMemberUser(member: GuildMember): Promise<User> {
+    const user = await member?.user?.fetch?.();
+    if (!user) return member.user;
+    user.flags = user.flags || (await user.fetchFlags());
+    return user;
+  }
+
+  private serializeUser(user: User): ISerializedUser {
+    const flags = user?.flags?.toArray?.() ?? [];
+    return { ...(user?.toJSON?.() as any), flags };
   }
 
   private async onReady(client: Client) {
