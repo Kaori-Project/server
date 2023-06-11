@@ -14,8 +14,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Kaori Bot API')
-    .setDescription('Kaori API documentation')
+    .setTitle(`${CONFIG.NAME} Bot API`)
+    .setDescription(`${CONFIG.NAME} API documentation`)
     .setVersion('1.0')
     .build();
 

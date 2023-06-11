@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Client,
-  GatewayIntentBits,
-  Guild,
-  GuildMember,
-  User,
-} from 'discord.js';
+import type { GuildMember, User } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import { CONFIG } from 'src/utils/config';
+import { KaoriError, KaoriErrorCodes } from 'src/utils/errors';
 import { cacheFactory } from 'src/utils/requests';
-
+import { DiscordUsersErrorCodes } from './users.types';
 const intents = [
   GatewayIntentBits.GuildPresences,
   GatewayIntentBits.Guilds,
@@ -18,7 +14,6 @@ const intents = [
 @Injectable()
 export class UsersService {
   private client: Client;
-  private guild: Guild;
   private requestCache = cacheFactory(1000);
   constructor() {
     this.client = new Client({ intents });
@@ -32,24 +27,30 @@ export class UsersService {
     const cacheKey = `getUserInfo-${userId}`;
     const cachedData = this.requestCache.get(cacheKey);
     if (cachedData) return cachedData;
-    try {
-      const member = await this.getGuildMember(userId);
-      const returnObj = {
-        user: member.user,
-        presence: member.presence,
-      };
-      this.requestCache.insert(cacheKey, returnObj);
-      return returnObj;
-    } catch (err) {
-      throw err?.rawError;
-    }
+    const member = await this.getGuildMember(userId);
+    const returnObj = {
+      user: member.user,
+      presence: member.presence,
+    };
+    this.requestCache.insert(cacheKey, returnObj);
+    return returnObj;
   }
 
-  private async getGuildMember(userId: string, updateGuild = false) {
-    if (!this.guild || updateGuild)
-      this.guild = await this.client.guilds.fetch(CONFIG.GUILD_ID);
-    const member = await this.guild.members.fetch(userId);
-    return member;
+  private async getGuildMember(
+    userId: string,
+    fetchUser = true,
+  ): Promise<GuildMember> {
+    for (const [, guild] of this.client.guilds.cache) {
+      try {
+        const member = await guild.members.fetch(userId);
+        if (fetchUser) member.user = await member.user.fetch();
+        return member;
+      } catch (err) {
+        if (![DiscordUsersErrorCodes.UnknownUser].includes(err?.rawError?.code))
+          throw err;
+      }
+      throw new KaoriError(KaoriErrorCodes.UserNotTracked);
+    }
   }
 
   private async onReady(client: Client) {

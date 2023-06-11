@@ -8,6 +8,7 @@ export class AppService {
     const appHomeTemplate = getTemplate('appHome');
     return appHomeTemplate({
       docsUri: CONFIG.DOCS_URI,
+      name: CONFIG.NAME,
     });
   }
 }

@@ -1,3 +1,3 @@
-export enum UsersErrorCodes {
+export enum DiscordUsersErrorCodes {
   UnknownUser = 10013,
 }

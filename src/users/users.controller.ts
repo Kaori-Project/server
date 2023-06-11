@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { KaoriError } from 'src/utils/errors';
 import { UsersService } from './users.service';
-import { UsersErrorCodes } from './users.types';
 
 @Controller('users')
 export class UsersController {
@@ -13,12 +13,8 @@ export class UsersController {
       const userData = await this.usersService.getUserInfo(userId);
       res.status(HttpStatus.OK).json({ userData });
     } catch (err) {
-      switch (err?.code) {
-        case UsersErrorCodes.UnknownUser:
-          res.status(HttpStatus.NOT_FOUND).json(err);
-        default:
-          throw err;
-      }
+      if (err instanceof KaoriError) res.status(err.status).json(err);
+      else throw err;
     }
   }
 }
