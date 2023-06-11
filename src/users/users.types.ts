@@ -1,3 +1,5 @@
+import type { GuildMember } from 'discord.js';
+
 export enum DiscordUsersErrorCodes {
   UnknownUser = 10013,
 }
@@ -19,4 +21,9 @@ export interface ISerializedUser {
   avatarURL: string;
   displayAvatarURL: string;
   bannerURL: string;
+}
+
+export interface ISerializedMember {
+  user: ISerializedUser;
+  presence: GuildMember['presence'];
 }

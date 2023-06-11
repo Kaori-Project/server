@@ -4,7 +4,8 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { CONFIG } from 'src/utils/config';
 import { KaoriError, KaoriErrorCodes } from 'src/utils/errors';
 import { cacheFactory } from 'src/utils/requests';
-import type { ISerializedUser } from './users.types';
+import { UsersSerializers } from './users.serializers';
+import type { ISerializedMember } from './users.types';
 import { DiscordUsersErrorCodes } from './users.types';
 
 const intents = [
@@ -17,23 +18,17 @@ const intents = [
 export class UsersService {
   private client: Client;
   private requestCache = cacheFactory(1000);
-  constructor() {
+  constructor(private serializers: UsersSerializers) {
     this.client = new Client({ intents });
     this.setupBot();
   }
 
-  async getUserInfo(userId: string): Promise<{
-    user: ISerializedUser;
-    presence: GuildMember['presence'];
-  }> {
+  async getUserInfo(userId: string): Promise<ISerializedMember> {
     const cacheKey = `getUserInfo-${userId}`;
     const cachedData = this.requestCache.get(cacheKey);
     if (cachedData) return cachedData;
     const member = await this.getGuildMember(userId);
-    const returnObj = {
-      user: this.serializeUser(member.user),
-      presence: member.presence,
-    };
+    const returnObj = this.serializers.guildMemberSerializer(member);
     this.requestCache.insert(cacheKey, returnObj);
     return returnObj;
   }
@@ -60,11 +55,6 @@ export class UsersService {
     if (!user) return member.user;
     user.flags = user.flags || (await user.fetchFlags());
     return user;
-  }
-
-  private serializeUser(user: User): ISerializedUser {
-    const flags = user?.flags?.toArray?.() ?? [];
-    return { ...(user?.toJSON?.() as any), flags };
   }
 
   private async onReady(client: Client) {
