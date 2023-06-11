@@ -43,7 +43,8 @@ export class UsersService {
     for (const [, guild] of this.client.guilds.cache) {
       try {
         const member = await guild.members.fetch(userId);
-        if (fetchUser) member.user = await member.user.fetch();
+        if (fetchUser)
+          member.user = (await member?.user?.fetch?.()) ?? member.user;
         return member;
       } catch (err) {
         if (![DiscordUsersErrorCodes.UnknownUser].includes(err?.rawError?.code))
